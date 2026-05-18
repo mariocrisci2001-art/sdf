@@ -1,0 +1,84 @@
+import React, { useRef, useEffect } from 'react';
+import { X } from 'lucide-react';
+import { motion } from 'motion/react';
+
+interface PianoKeyboardProps {
+  onClose: () => void;
+}
+
+const keys = [
+  { note: 'C4', color: 'white', freq: 261.63 },
+  { note: 'C#4', color: 'black', freq: 277.18 },
+  { note: 'D4', color: 'white', freq: 293.66 },
+  { note: 'D#4', color: 'black', freq: 311.13 },
+  { note: 'E4', color: 'white', freq: 329.63 },
+  { note: 'F4', color: 'white', freq: 349.23 },
+  { note: 'F#4', color: 'black', freq: 369.99 },
+  { note: 'G4', color: 'white', freq: 392.00 },
+  { note: 'G#4', color: 'black', freq: 415.30 },
+  { note: 'A4', color: 'white', freq: 440.00 },
+  { note: 'A#4', color: 'black', freq: 466.16 },
+  { note: 'B4', color: 'white', freq: 493.88 },
+  { note: 'C5', color: 'white', freq: 523.25 },
+];
+
+export default function PianoKeyboard({ onClose }: PianoKeyboardProps) {
+  const audioContext = useRef<AudioContext | null>(null);
+
+  const playNote = (freq: number) => {
+    if (!audioContext.current) audioContext.current = new AudioContext();
+    const ctx = audioContext.current;
+    
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    osc.start();
+    osc.stop(ctx.currentTime + 1.5);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 50 }}
+      className="fixed bottom-32 left-1/2 -translate-x-1/2 p-4 bg-zinc-900/95 backdrop-blur-2xl rounded-[32px] border border-white/10 shadow-2xl z-[60] no-toggle"
+    >
+      <div className="flex items-center justify-between mb-4 px-4">
+        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Piano Keyboard</span>
+        <button onClick={onClose} className="text-white/40 hover:text-white">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="flex relative h-40 px-2 pb-2">
+        {keys.map((key, i) => (
+          <button
+            key={key.note}
+            onClick={() => playNote(key.freq)}
+            className={`
+              relative z-10 mx-[1px] rounded-b-lg transition-all active:translate-y-1
+              ${key.color === 'white' 
+                ? 'w-12 h-full bg-white hover:bg-zinc-100 shadow-[inset_0_-4px_0_rgba(0,0,0,0.1)] active:shadow-none' 
+                : 'w-8 h-[60%] bg-zinc-800 hover:bg-zinc-700 -mx-4 z-20 shadow-xl border-x border-zinc-900'}
+            `}
+          >
+            {key.color === 'white' && (
+              <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-bold text-zinc-400">
+                {key.note}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+    </motion.div>
+  );
+}

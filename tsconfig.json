@@ -1,0 +1,8 @@
+{
+  "name": "MCScores",
+  "description": "Un lettore di spartiti musicali immersivo con annotazioni tramite penna digitale e gestione della libreria.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
