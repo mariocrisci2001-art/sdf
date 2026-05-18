@@ -1,0 +1,23 @@
+name: Converti Web in APK
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Recupera i file dal repository
+        uses: actions/checkout@v4
+
+      - name: Crea l'APK Android dai file Web
+        uses: darkshredder/website-to-apk-action@v2.2.0
+        with:
+          app-name: "Score Reader"
+          # Se i tuoi file (come index.html) sono nella cartella principale, lascia "." 
+          # Se sono dentro una cartella specifica (es. "public" o "dist"), scrivi il nome della cartella qui sotto
+          build-folder-path: "." 
+
+      - name: Carica il file APK pronto nei download
+        uses: actions/upload-artifact@v4
+        with:
+          name: il-mio-apk-spartiti
+          path: apk/
